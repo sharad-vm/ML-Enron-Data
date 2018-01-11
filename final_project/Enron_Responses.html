@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" />
-<title>Enron Free-Response Questions</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>Enron_Responses</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
 <style type="text/css">
@@ -11786,7 +11786,20 @@ div#notebook {
 <p><strong>1. Summarize for us the goal of this project and how machine learning is useful in trying to accomplish it. As part of your answer, give some background on the dataset and how it can be used to answer the project question. Were there any outliers in the data when you got it, and how did you handle those?  [relevant rubric items: “data exploration”, “outlier investigation”]</strong></p>
 <p>Enron Corporation, an American energy company based in Houston, TX was formed by Kenneth Lay in 1985 and by the year 2000, it was one of the largest companies in the US. It is believed that Jeffrey Skilling was one of the key persons in developing a staff of executives that used accounting loopholes and poor financial reporting to hide billions of dollars in debt from failed deals and projects. Towards the end of 2001, the company collpsed into bankruptcy.</p>
 <p>The Enron scandal, publicized in October 2001, eventually led to the bankruptcy of the company, whcih turned out to be the largest bankruptcy reorganization in American history at that time and the biggest audit failure.</p>
-<p>The Enron dataset used in this project consists of financial and email data of a bunch of executives who worked for Enron. The goal of this project is to use different machine learning algorithms and potentially tune them to accurately identify if a person is of interest or not. As part of the project, I used different features of the data set and created a few new features when necessary to try and improve the accuracy, precision and recall of various different algorithms to finally pick one algorithm that has the best of the scores.</p>
+<p>The Enron dataset used in this project consists of financial and email data of 146 executives of which 18 were POI. Each data point (executive) has 21 features. The goal of this project is to use different machine learning algorithms and potentially tune them to accurately identify if a person is of interest or not. As part of the project, I used different features of the data set and created a few new features when necessary to try and improve the accuracy, precision and recall of various different algorithms to finally pick one algorithm that has the best of the scores.</p>
+<h6 id="Data-Overview">Data Overview<a class="anchor-link" href="#Data-Overview">&#194;&#182;</a></h6><p>I used Python to load the dataset into a dataframe and explred the dataset for some basic statistics and structure.</p>
+<ul>
+<li>Number of executives: 146</li>
+<li>Number of POIs: 18</li>
+<li>Number of features: 21</li>
+</ul>
+<h6 id="Outliers">Outliers<a class="anchor-link" href="#Outliers">&#194;&#182;</a></h6><p>I also looked for any potential outliers and came up with the below, all of which I removed from the dataset prior to training and testing a few algorithms.</p>
+<ul>
+<li>I plotted Salary against Bonus to find one data point that was way off compared to the rest and after filtering on the dataframe, I realized that it was just a 'Total' of all the datapoints. Clearly, this will not help us in any predictions and so I dropped from the dataframe</li>
+<li>I looked for executives who have no valid values in any of their features and found LOCKHART EUGENE E to have nothing populated and since this will not help in anyway and might even skew the error, I dropped this record</li>
+<li>I also found a record that looked less like an executive and more like an agency. Since we are looking to identify a Person Of Interest(POI) and not an agency, I dropped this record from the dataframe</li>
+<li>Interestingly, I found 2 executives whose features seems to have been shifted to right. I updated the features of the 2 executives - Belfer Robert, Bhatnagar Sanjay before proceeding</li>
+</ul>
 
 </div>
 </div>
@@ -11796,8 +11809,197 @@ div#notebook {
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>2. What features did you end up using in your POI identifier, and what selection process did you use to pick them? Did you have to do any scaling? Why or why not? As part of the assignment, you should attempt to engineer your own feature that does not come ready-made in the dataset -- explain what feature you tried to make, and the rationale behind it. (You do not necessarily have to use it in the final analysis, only engineer and test it.) In your feature selection step, if you used an algorithm like a decision tree, please also give the feature importances of the features that you use, and if you used an automated feature selection function like SelectKBest, please report the feature scores and reasons for your choice of parameter values.  [relevant rubric items: “create new features”, “intelligently select features”, “properly scale features”]</strong></p>
-<h5 id="Features-used:">Features used:<a class="anchor-link" href="#Features-used:">&#194;&#182;</a></h5><p>I started with all the features available except email address to see how algorithms perform and then tried adding new features to see if they had any effect on the algorthms. 
-But, for my final design, I used SelectKBest to get the best features to obtain the the best precision and recall scores during testing. I created train and test sets with the use of Stratified Shuffle Split cross validation due to small size of the data and that of the POI list.</p>
+<h5 id="Features-used:">Features used:<a class="anchor-link" href="#Features-used:">&#194;&#182;</a></h5><p>I started with all the features available except email address to see how algorithms perform and then tried adding new features to see if they had any effect on the algorthms.</p>
+<p>Here is how the algorithms performed initially:</p>
+<table>
+<thead><tr>
+<th>Classifier</th>
+<th>Precision</th>
+<th>Recall</th>
+<th>F1 Score</th>
+<th>Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RandomForest</td>
+<td>0.55</td>
+<td>0.17</td>
+<td>0.27</td>
+<td>0.87</td>
+</tr>
+<tr>
+<td>GaussianNB</td>
+<td>0.23</td>
+<td>0.37</td>
+<td>0.30</td>
+<td>0.76</td>
+</tr>
+<tr>
+<td>DecisionTree</td>
+<td>0.33</td>
+<td>0.34</td>
+<td>0.33</td>
+<td>0.82</td>
+</tr>
+<tr>
+<td>KNeighbors</td>
+<td>0.35</td>
+<td>0.05</td>
+<td>0.09</td>
+<td>0.86</td>
+</tr>
+<tr>
+<td>AdaBoost</td>
+<td>0.48</td>
+<td>0.35</td>
+<td>0.40</td>
+<td>0.86</td>
+</tr>
+<tr>
+<td>ExtraTrees</td>
+<td>0.50</td>
+<td>0.17</td>
+<td>0.26</td>
+<td>0.86</td>
+</tr>
+<tr>
+<td>KMeans (n_clusters=2)</td>
+<td>0.21</td>
+<td>0.08</td>
+<td>0.12</td>
+<td>0.83</td>
+</tr>
+</tbody>
+</table>
+<p>Although I have some good numbers for accuracy, my recall and precision could still improve.</p>
+<p>Creating and adding fraction_from_poi, fraction_to_poi and fraction_shared_receipt to the features list, provided the following results:</p>
+<table>
+<thead><tr>
+<th>Classifier</th>
+<th>Precision</th>
+<th>Recall</th>
+<th>F1 Score</th>
+<th>Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RandomForest</td>
+<td>0.67</td>
+<td>0.27</td>
+<td>0.36</td>
+<td>0.88</td>
+</tr>
+<tr>
+<td>GaussianNB</td>
+<td>0.25</td>
+<td>0.37</td>
+<td>0.30</td>
+<td>0.76</td>
+</tr>
+<tr>
+<td>DecisionTree</td>
+<td>0.61</td>
+<td>0.61</td>
+<td>0.61</td>
+<td>0.89</td>
+</tr>
+<tr>
+<td>KNeighbors</td>
+<td>0.35</td>
+<td>0.05</td>
+<td>0.09</td>
+<td>0.86</td>
+</tr>
+<tr>
+<td>AdaBoost</td>
+<td>0.65</td>
+<td>0.53</td>
+<td>0.58</td>
+<td>0.89</td>
+</tr>
+<tr>
+<td>ExtraTrees</td>
+<td>0.64</td>
+<td>0.27</td>
+<td>0.38</td>
+<td>0.88</td>
+</tr>
+<tr>
+<td>KMeans (n_clusters=2)</td>
+<td>0.21</td>
+<td>0.08</td>
+<td>0.12</td>
+<td>0.83</td>
+</tr>
+</tbody>
+</table>
+<p>This boosted the F1 score on almost all the models and also made 2 algorithms stand out - Decision Tree and AdaBoost.</p>
+<p>I further added bonus_to_salary and bonus_to_total to the list and here is how the models performed with this addition:</p>
+<table>
+<thead><tr>
+<th>Classifier</th>
+<th>Precision</th>
+<th>Recall</th>
+<th>F1 Score</th>
+<th>Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RandomForest</td>
+<td>0.62</td>
+<td>0.23</td>
+<td>0.34</td>
+<td>0.87</td>
+</tr>
+<tr>
+<td>GaussianNB</td>
+<td>0.25</td>
+<td>0.37</td>
+<td>0.30</td>
+<td>0.76</td>
+</tr>
+<tr>
+<td>DecisionTree</td>
+<td>0.62</td>
+<td>0.60</td>
+<td>0.61</td>
+<td>0.89</td>
+</tr>
+<tr>
+<td>KNeighbors</td>
+<td>0.35</td>
+<td>0.05</td>
+<td>0.09</td>
+<td>0.86</td>
+</tr>
+<tr>
+<td>AdaBoost</td>
+<td>0.62</td>
+<td>0.51</td>
+<td>0.51</td>
+<td>0.89</td>
+</tr>
+<tr>
+<td>ExtraTrees</td>
+<td>0.63</td>
+<td>0.25</td>
+<td>0.36</td>
+<td>0.88</td>
+</tr>
+<tr>
+<td>KMeans (n_clusters=2)</td>
+<td>0.21</td>
+<td>0.08</td>
+<td>0.12</td>
+<td>0.83</td>
+</tr>
+</tbody>
+</table>
+<p>The 2 new features did not have any quantitative effect on most of the models and even degraded the overall performance of a few models and so I had to revert this change back by dropping these newly created features.</p>
+<p>For my final design, I used SelectKBest to get the best features to obtain the the best precision and recall scores during testing. I created train and test sets with the use of Stratified Shuffle Split cross validation due to small size of the data and that of the POI list.</p>
 <p>The final features utilized in the model and their imoportance are:</p>
 <ul>
 <li>fraction_to_poi : 25.8782</li>
@@ -11818,7 +12020,7 @@ But, for my final design, I used SelectKBest to get the best features to obtain 
 <li>fraction_from_poi : 2.5928</li>
 <li>from_this_person_to_poi : 2.4456</li>
 </ul>
-<h5 id="Feature-creation:">Feature creation:<a class="anchor-link" href="#Feature-creation:">&#194;&#182;</a></h5><p>I created five new features using existing features. I created fraction_to_poi and fraction_from_poi features, to see if perhaps I could identify a POI by whether that person had a certain percentage of his/her outgoing or incoming emails with a POI. I also created fraction_shared_receipt, bonus_to_salary and bonus_to_total because an executive's high expense/salary ratio or bonus to salary or total income ratios could be potentially flagged as POIs. However, only 3 of these 5 features made it through the best features.</p>
+<h5 id="Feature-creation:">Feature creation:<a class="anchor-link" href="#Feature-creation:">&#194;&#182;</a></h5><p>As explained above, I created five new features using some of the existing features. I created fraction_to_poi and fraction_from_poi features, to see if perhaps I could identify a POI by whether that person had a certain percentage of his/her outgoing or incoming emails with a POI. I also created fraction_shared_receipt, bonus_to_salary and bonus_to_total because an executive's high expense/salary ratio or bonus to salary or total income ratios could be potentially flagged as POIs. However, only 3 of these 5 features made it through the best features.</p>
 <p>This was evident when I added the 2 bonus to salary and total ratios to the features list and tested for performance. Adding these features to the feature list resulted in a poorer performance and so I dropped these features from the final list before sending it to SelectKBest model.</p>
 <h5 id="Feature-scaling:">Feature scaling:<a class="anchor-link" href="#Feature-scaling:">&#194;&#182;</a></h5><p>I did not have to do any feature scaling, because I used the AdaBoost classifier, which uses boosted decision trees. Decision trees do not need feature scaling. I did implement a feature scaling function when I was testing out classifier types though -- in particular I needed it for the KMeans classifier because that classifier doesn't function well when data from different features are scaled fairly differently.</p>
 
@@ -11864,7 +12066,7 @@ But, for my final design, I used SelectKBest to get the best features to obtain 
 <p><strong>5. What is validation, and what’s a classic mistake you can make if you do it wrong? How did you validate your analysis?  [relevant rubric items: “discuss validation”, “validation strategy”]</strong></p>
 <p>Validation in Machine Learning is the process of checking how well the model or algorithm would fit on data outside of the training data set used in training the model. This is usually achieved by splitting the avaialble data set into two chunks - one for training and one for testing. The most commonly used ratio for this split is 70:30. The model is trained on the split 70% of the data and validated by testing on the 30% of the data.</p>
 <p>A classic mistake is to 'overfit' the data by closely modeling the algorithm based on the enitre data set that would result in the best performance on the same data but would fail on any data outside of the training data.</p>
-<p>To validate my model, I used the tester.py script provided that uses the StratifiedKFold cross-validation method that provides metrics on the classifer.</p>
+<p>To validate my model, I used the tester.py script provided that uses the Stratified Shuffle Split cross-validation method that provides metrics on the classifer. Stratified Shuffle Split is used because with this cross validation method, the data is shuffled every time and then split which means the test sets may overlap between the splits, although this is not guaranteed. Since our dataset is small and the number of POI is even smaller, Stratified Shuffle Split is ideal in this case.</p>
 
 </div>
 </div>
