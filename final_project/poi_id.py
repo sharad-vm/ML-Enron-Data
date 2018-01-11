@@ -3,7 +3,6 @@
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-%matplotlib inline  
 import sys
 import pickle
 import sklearn
@@ -135,10 +134,6 @@ data_dict = enrondf.to_dict(orient='index')
 
 my_dataset = data_dict
 
-### Extract features and labels from dataset for local testing
-data = featureFormat(my_dataset, features_list, sort_keys = True)
-labels, features = targetFeatureSplit(data)
-
 ### Task 4: Try a varity of classifiers
 ### Please name your classifier clf for easy export below.
 ### Note that if you want to do PCA or other multi-stage operations,
@@ -170,12 +165,9 @@ def set_classifier(x):
 #Test for all the algorithms defined earlier
 for classifier in ['rfc','dtr','gnb','kn','ada','xtra','km']:
     clf = set_classifier(classifier)
-    clf.fit(features_train,labels_train)
-    scores = clf.score(features_test,labels_test)
-
-    print "Classifier:"
-    evaluate.evaluate_clf(clf, features, labels, num_iters=1000, test_size=0.3)
-    print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+    tester.dump_classifier_and_data(clf, my_dataset, features_list)
+    tester.main();
+    
     print "====================================================================="
 
 ### Task 5: Tune your classifier to achieve better than .3 precision and recall 
@@ -204,4 +196,4 @@ tree_clf = DecisionTreeClassifier(class_weight=None, criterion='entropy', max_de
 ### that the version of poi_id.py that you submit can be run on its own and
 ### generates the necessary .pkl files for validating your results.
 
-dump_classifier_and_data(clf, my_dataset, features_list)
+dump_classifier_and_data(tree_clf, my_dataset, features_list)
